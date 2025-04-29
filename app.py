@@ -7,12 +7,14 @@
 import json
 import os.path
 import time
+import threading
 from datetime import datetime, timedelta
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
 from notion_client import Client
+from flask import Flask
 
 # ------------------- CONFIGURATION -------------------
 
@@ -39,6 +41,9 @@ POLL_INTERVAL = 10  # 5 minutes
 EVENT_TIME_RANGE_DAYS = 2  # Sync events up to 7 days in the future
 # Time range for fetching past events (days before now)
 PAST_EVENT_RANGE_DAYS = 3  # Sync events from 3 days in the past
+
+# Flask App Initialization
+app = Flask(__name__)
 
 # -------------------------------------------------------------------
 
@@ -258,7 +263,7 @@ def delete_notion_page(notion, page_id, event_id):
 
 def sync_events(service, creds):
     """Sync Google Calendar events to Notion, handling additions, updates, and deletions."""
-    print(f"\nStarting sync at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}...")
+    print(f"\nStarting sync cycle at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}...")
     
     # Refresh credentials if needed
     service, creds = refresh_credentials_if_needed(service, creds)
@@ -315,30 +320,52 @@ def sync_events(service, creds):
     cache['last_sync'] = datetime.utcnow().isoformat()
     save_cache(cache)
 
-    print(f"Sync complete. Added: {added}, Updated: {updated}, Deleted: {deleted}, Skipped: {skipped}")
+    print(f"Sync cycle complete. Added: {added}, Updated: {updated}, Deleted: {deleted}, Skipped: {skipped}")
     return True, service, creds
 
-def main():
-    """Run the sync continuously with single authentication."""
-    print("Starting continuous calendar sync...")
+def run_sync_loop():
+    """Run the sync continuously in a loop."""
+    print("Starting continuous calendar sync thread...")
     service, creds = get_calendar_service()
     if not service:
-        print("Failed to initialize calendar service. Exiting...")
-        exit(1)
+        print("Failed to initialize calendar service for sync thread. Exiting thread...")
+        return # Exit thread if service fails initially
 
     while True:
         try:
             success, service, creds = sync_events(service, creds)
             if not success:
-                print(f"Sync failed. Retrying in {POLL_INTERVAL} seconds...")
+                print(f"Sync cycle failed. Retrying in {POLL_INTERVAL} seconds...")
+            else:
+                # Optional: Add a small log to confirm sync thread is alive after successful cycle
+                print(f"Sync thread alive, next check in {POLL_INTERVAL} seconds.")
             time.sleep(POLL_INTERVAL)
         except KeyboardInterrupt:
-            print("\nStopping sync...")
+            # This won't be caught here anymore as main thread handles it
+            print("\nStopping sync thread...")
             break
         except Exception as e:
-            print(f"Unexpected error during sync: {e}")
-            print(f"Retrying in {POLL_INTERVAL} seconds...")
-            time.sleep(POLL_INTERVAL)
+            print(f"Unexpected error during sync cycle: {e}")
+            print(f"Retrying sync in {POLL_INTERVAL} seconds...")
+            time.sleep(POLL_INTERVAL) # Wait before retrying after an error
+
+@app.route('/')
+def home():
+    """Basic route for the Flask app."""
+    return "<h1>Hey Yash</h1>"
+
+def main():
+    """Start the sync thread and run the Flask app."""
+    print("Starting Flask app and background sync...")
+
+    # Start the background sync thread
+    sync_thread = threading.Thread(target=run_sync_loop, daemon=True)
+    sync_thread.start()
+
+    # Run the Flask web server
+    # Use 0.0.0.0 to be accessible externally (important for Render/Docker)
+    print("Starting Flask server on port 8000...")
+    app.run(host='0.0.0.0', port=8000)
 
 if __name__ == '__main__':
     main()
