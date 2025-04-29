@@ -1,0 +1,61 @@
+{
+  "events": {
+    "5da0e05294b34d45ab83cb798a79629a": {
+      "summary": "study session ",
+      "start": {
+        "dateTime": "2025-04-29T21:00:00+05:30",
+        "timeZone": "Asia/Kolkata"
+      },
+      "end": {
+        "dateTime": "2025-04-29T23:00:00+05:30",
+        "timeZone": "Asia/Kolkata"
+      },
+      "description": null,
+      "location": null,
+      "htmlLink": "https://www.google.com/calendar/event?eid=NWRhMGUwNTI5NGIzNGQ0NWFiODNjYjc5OGE3OTYyOWEgeWFzaGt1c2h3YWhheXRAbQ"
+    },
+    "b0c1db6111bf435c814313654f5d0918": {
+      "summary": "Mathematics of Finance ",
+      "start": {
+        "dateTime": "2025-04-30T06:00:00+05:30",
+        "timeZone": "Asia/Kolkata"
+      },
+      "end": {
+        "dateTime": "2025-04-30T08:00:00+05:30",
+        "timeZone": "Asia/Kolkata"
+      },
+      "description": null,
+      "location": null,
+      "htmlLink": "https://www.google.com/calendar/event?eid=YjBjMWRiNjExMWJmNDM1YzgxNDMxMzY1NGY1ZDA5MTggeWFzaGt1c2h3YWhheXRAbQ"
+    },
+    "17aa21f0088344d68a37706dcbfdcf4e": {
+      "summary": "this has to be done ",
+      "start": {
+        "dateTime": "2025-04-30T10:45:00+05:30",
+        "timeZone": "Asia/Kolkata"
+      },
+      "end": {
+        "dateTime": "2025-04-30T13:45:00+05:30",
+        "timeZone": "Asia/Kolkata"
+      },
+      "description": null,
+      "location": null,
+      "htmlLink": "https://www.google.com/calendar/event?eid=MTdhYTIxZjAwODgzNDRkNjhhMzc3MDZkY2JmZGNmNGUgeWFzaGt1c2h3YWhheXRAbQ"
+    },
+    "5qjk2fqi03bu5d4ebjfcftoadh": {
+      "summary": "hey buddy",
+      "start": {
+        "dateTime": "2025-05-01T03:15:00+05:30",
+        "timeZone": "Asia/Kolkata"
+      },
+      "end": {
+        "dateTime": "2025-05-01T05:30:00+05:30",
+        "timeZone": "Asia/Kolkata"
+      },
+      "description": null,
+      "location": null,
+      "htmlLink": "https://www.google.com/calendar/event?eid=NXFqazJmcWkwM2J1NWQ0ZWJqZmNmdG9hZGggeWFzaGt1c2h3YWhheXRAbQ"
+    }
+  },
+  "last_sync": "2025-04-29T17:48:16.022110"
+}
