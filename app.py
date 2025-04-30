@@ -8,6 +8,7 @@ import json
 import os.path
 import time
 import threading
+import logging
 from datetime import datetime, timedelta
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -255,10 +256,12 @@ def delete_notion_page(notion, page_id, event_id):
     """Delete a Notion page by its page ID."""
     try:
         notion.pages.update(page_id=page_id, archived=True)
-        print(f"Deleted Notion page for event ID {event_id}")
+        print(f"Archived Notion page for event ID {event_id}")
         return True
     except Exception as e:
-        print(f"Error deleting Notion page for event ID {event_id}: {e}")
+        print(f"Error archiving Notion page for event ID {event_id} (Page ID: {page_id}): {e}")
+        import traceback
+        traceback.print_exc()
         return False
 
 def sync_events(service, creds):
@@ -361,6 +364,10 @@ def main():
     # Start the background sync thread
     sync_thread = threading.Thread(target=run_sync_loop, daemon=True)
     sync_thread.start()
+
+    # Silence Werkzeug's default logger after Flask startup message
+    log = logging.getLogger('werkzeug')
+    log.setLevel(logging.ERROR)
 
     # Run the Flask web server
     # Use 0.0.0.0 to be accessible externally (important for Render/Docker)
