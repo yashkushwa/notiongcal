@@ -13,6 +13,8 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
 from notion_client import Client
+import threading
+from flask import Flask
 
 # ------------------- CONFIGURATION -------------------
 
@@ -41,6 +43,13 @@ EVENT_TIME_RANGE_DAYS = 2  # Sync events up to 7 days in the future
 PAST_EVENT_RANGE_DAYS = 3  # Sync events from 3 days in the past
 
 # -------------------------------------------------------------------
+
+# Flask app setup
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    return "hey Yash"
 
 def load_cache():
     """Load the event cache from disk."""
@@ -318,9 +327,21 @@ def sync_events(service, creds):
     print(f"Sync complete. Added: {added}, Updated: {updated}, Deleted: {deleted}, Skipped: {skipped}")
     return True, service, creds
 
+def run_flask_app():
+    """Runs the Flask app."""
+    print("Starting Flask server on http://0.0.0.0:8000")
+    # Use '0.0.0.0' to make it accessible from the network
+    # Set debug=False for production/concurrent use
+    app.run(host='0.0.0.0', port=8000, debug=False)
+
 def main():
     """Run the sync continuously with single authentication."""
     print("Starting continuous calendar sync...")
+
+    # Start Flask app in a background thread
+    flask_thread = threading.Thread(target=run_flask_app, daemon=True)
+    flask_thread.start()
+
     service, creds = get_calendar_service()
     if not service:
         print("Failed to initialize calendar service. Exiting...")
