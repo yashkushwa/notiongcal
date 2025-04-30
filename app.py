@@ -15,6 +15,7 @@ from googleapiclient.discovery import build
 from notion_client import Client
 import threading
 from flask import Flask
+import logging
 
 # ------------------- CONFIGURATION -------------------
 
@@ -329,6 +330,10 @@ def sync_events(service, creds):
 
 def run_flask_app():
     """Runs the Flask app."""
+    # Silence Werkzeug's default logger for cleaner output
+    log = logging.getLogger('werkzeug')
+    log.setLevel(logging.ERROR)
+
     print("Starting Flask server on http://0.0.0.0:8000")
     # Use '0.0.0.0' to make it accessible from the network
     # Set debug=False for production/concurrent use
