@@ -328,29 +328,38 @@ def sync_events(service, creds):
 
 def run_sync_loop():
     """Run the sync continuously in a loop."""
-    print("Starting continuous calendar sync thread...")
+    print("Starting continuous calendar sync thread...", flush=True)
     service, creds = get_calendar_service()
     if not service:
-        print("Failed to initialize calendar service for sync thread. Exiting thread...")
-        return # Exit thread if service fails initially
+        print("Failed to initialize calendar service for sync thread. Exiting thread...", flush=True)
+        return
 
     while True:
+        print("Sync thread: Starting new cycle.", flush=True)
         try:
-            success, service, creds = sync_events(service, creds)
-            if not success:
-                print(f"Sync cycle failed. Retrying in {POLL_INTERVAL} seconds...")
-            else:
-                # Optional: Add a small log to confirm sync thread is alive after successful cycle
-                print(f"Sync thread alive, next check in {POLL_INTERVAL} seconds.")
+            try:
+                success, service, creds = sync_events(service, creds)
+                if not success:
+                    print(f"Sync cycle reported failure. Retrying in {POLL_INTERVAL} seconds...", flush=True)
+                else:
+                    print(f"Sync thread alive, next check in {POLL_INTERVAL} seconds.", flush=True)
+            except Exception as sync_err:
+                print(f"!!! Error occurred *during* sync_events call: {sync_err}", flush=True)
+                import traceback
+                traceback.print_exc()
+                print(f"Retrying sync in {POLL_INTERVAL} seconds after internal error...", flush=True)
+
             time.sleep(POLL_INTERVAL)
+
         except KeyboardInterrupt:
-            # This won't be caught here anymore as main thread handles it
-            print("\nStopping sync thread...")
+            print("\nStopping sync thread (KeyboardInterrupt)...", flush=True)
             break
         except Exception as e:
-            print(f"Unexpected error during sync cycle: {e}")
-            print(f"Retrying sync in {POLL_INTERVAL} seconds...")
-            time.sleep(POLL_INTERVAL) # Wait before retrying after an error
+            print(f"Unexpected error in sync loop (outside sync_events call): {e}", flush=True)
+            import traceback
+            traceback.print_exc()
+            print(f"Retrying sync loop in {POLL_INTERVAL} seconds...", flush=True)
+            time.sleep(POLL_INTERVAL)
 
 @app.route('/')
 def home():
